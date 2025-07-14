@@ -127,6 +127,8 @@ enum {
    param_mono,
    param_fast_decay,
    param_antialiasing,
+   param_pre_resample,
+   param_dynamic_load,
    param_control_rate,
    num_params
 };
@@ -177,6 +179,18 @@ bool my_plug_param_get_info(const clap_plugin_t *plugin, uint32_t index, clap_pa
       info->max_value = 1;
       info->default_value = 1;
       return true;
+   case param_pre_resample:
+      snprintf(info->name, CLAP_NAME_SIZE, "%s", "PreResample");
+      info->min_value = 0;
+      info->max_value = 1;
+      info->default_value = 1;
+      return true;
+   case param_dynamic_load:
+      snprintf(info->name, CLAP_NAME_SIZE, "%s", "DynamicLoad");
+      info->min_value = 0;
+      info->max_value = 1;
+      info->default_value = 0;
+      return true;
    case param_control_rate:
       snprintf(info->name, CLAP_NAME_SIZE, "%s", "ControlRate");
       info->min_value = timid_get_sample_rate(&plug->synth)/MAX_CONTROL_RATIO;
@@ -207,6 +221,12 @@ void my_plug_param_set_value(my_plug_t *plug, clap_id id, double value) {
    case param_antialiasing:
       timid_set_antialiasing(&plug->synth, (int)value);
       break;
+   case param_pre_resample:
+      timid_set_pre_resample(&plug->synth, (int)value);
+      break;
+   case param_dynamic_load:
+      timid_set_dynamic_instrument_load(&plug->synth, (int)value);
+      break;
    case param_control_rate:
       timid_set_control_rate(&plug->synth, (int)value);
       break;
@@ -234,6 +254,12 @@ bool my_plug_param_get_value(const clap_plugin_t *plugin, clap_id id, double *va
    case param_antialiasing:
       *value = timid_get_antialiasing(&plug->synth);
       return true;
+   case param_pre_resample:
+      *value = timid_get_pre_resample(&plug->synth);
+      return true;
+   case param_dynamic_load:
+      *value = timid_get_dynamic_instrument_load(&plug->synth);
+      return true;
    case param_control_rate:
       *value = timid_get_control_rate(&plug->synth);
       return true;
@@ -252,6 +278,8 @@ bool my_plug_param_value_to_text(const clap_plugin_t *plugin, clap_id id, double
    case param_mono:
    case param_fast_decay:
    case param_antialiasing:
+   case param_pre_resample:
+   case param_dynamic_load:
       if (value)
          snprintf(buffer, size, "%s", "ON");
       else
