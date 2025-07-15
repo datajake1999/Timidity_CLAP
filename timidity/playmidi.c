@@ -828,11 +828,14 @@ void timid_init(Timid *tm)
 #else
     tm->fast_decay=0;
 #endif
+    tm->dynamic_loading=0;
     tm->voices=DEFAULT_VOICES;
     tm->play_mode.rate=DEFAULT_RATE;
+    tm->play_mode.encoding=0;
     tm->control_rate=CONTROLS_PER_SECOND;
     tm->control_ratio = tm->play_mode.rate/tm->control_rate;
     tm->drumchannels=DEFAULT_DRUMCHANNELS;
+    tm->quietchannels=0;
     tm->adjust_panning_immediately=1;
     init_tables(tm);
     reset_midi(tm);
@@ -2135,7 +2138,7 @@ int timid_force_instrument_load(Timid *tm)
             int j;
             for (j=0; j<128; j++)
             {
-                if (!tm->tonebank[i]->tone[j].instrument)
+                if (tm->tonebank[i]->tone[j].name && !tm->tonebank[i]->tone[j].instrument)
                 {
                     tm->tonebank[i]->tone[j].instrument=MAGIC_LOAD_INSTRUMENT;
                 }
@@ -2146,7 +2149,7 @@ int timid_force_instrument_load(Timid *tm)
             int j;
             for (j=0; j<128; j++)
             {
-                if (!tm->drumset[i]->tone[j].instrument)
+                if (tm->drumset[i]->tone[j].name && !tm->drumset[i]->tone[j].instrument)
                 {
                     tm->drumset[i]->tone[j].instrument=MAGIC_LOAD_INSTRUMENT;
                 }
